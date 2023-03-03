@@ -21,11 +21,19 @@ defineProps({
       <el-button type="info">Info</el-button>
       <el-button type="warning">Warning</el-button>
       <el-button type="danger">Danger</el-button>
+      <div class="demo">
+        <p class="demo_title">测试SCSS</p>
+      </div>
     </el-row>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+.demo{
+  .demo_title{
+    color: deeppink;
+  }
+}
 h1 {
   font-weight: 500;
   font-size: 2.6rem;
