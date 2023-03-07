@@ -20,7 +20,7 @@ export const getUrl = function () {
  * 根据运行环境获取基础请求URL的端口
  */
 export const getUrlPort = function () {
-    const url = this.getUrl()
+    const url = getUrl()
     return new URL(url).port
 }
 
@@ -29,115 +29,98 @@ export const getUrlPort = function () {
  * 默认开启`reduceDataFormat(简洁响应)`,返回类型为`ApiPromise`
  * 关闭`reduceDataFormat`,返回类型则为`AxiosPromise`
  */
-function createAxios(axiosConfig = {}, options = {}, loading = {}) {
-    if (options === void 0) {
-        options = {}
-    }
-    if (loading === void 0) {
-        loading = {}
-    }
-    const Axios = axios.create({
-        baseURL: this.getUrl(),
-        timeout: 1000 * 10,
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            server: true,
-        },
-        responseType: 'json',
-    })
 
-    // 自定义配置
-    options = Object.assign({
-        CancelDuplicateRequest: true, // 是否开启取消重复请求, 默认为 true
-        loading: false, // 是否开启loading层效果, 默认为false
-        reduceDataFormat: true, // 是否开启简洁的数据结构响应, 默认为true
-        showErrorMessage: true, // 是否开启接口错误信息展示,默认为true
-        showCodeMessage: true, // 是否开启code不为1时的信息提示, 默认为true
-        showSuccessMessage: false, // 是否开启code为1时的信息提示, 默认为false
-        anotherToken: '', // 当前请求使用另外的用户token
-    })
+const service = axios.create({
+    baseURL: '/test/',
+    timeout: 1000 * 10,
+    headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        server: true,
+    },
+    responseType: 'json',
+})
+// 自定义配置
+let options = Object.assign({
+    CancelDuplicateRequest: true, // 是否开启取消重复请求, 默认为 true
+    loading: false, // 是否开启loading层效果, 默认为false
+    reduceDataFormat: true, // 是否开启简洁的数据结构响应, 默认为true
+    showErrorMessage: true, // 是否开启接口错误信息展示,默认为true
+    showCodeMessage: true, // 是否开启code不为1时的信息提示, 默认为true
+    showSuccessMessage: false, // 是否开启code为1时的信息提示, 默认为false
+    anotherToken: '', // 当前请求使用另外的用户token
+})
 
-    // 请求拦截
-    Axios.interceptors.request.use(
-        config => {
-            removePending(config) // 每次请求前，先检查请求是否重复了，重复了就取消上一次的请求
-            options.CancelDuplicateRequest && addPending(config) // 开启了重复请求，就把请求添加到队列中
-            // 创建loading实例
-            if (options.loading) {
-                loadingInstance.count++
-                if (loadingInstance.count === 1) {
-                    loadingInstance.target = ElLoading.service(loading)
-                }
+// 请求拦截
+service.interceptors.request.use(
+    config => {
+        removePending(config) // 每次请求前，先检查请求是否重复了，重复了就取消上一次的请求
+        options.CancelDuplicateRequest && addPending(config) // 开启了重复请求，就把请求添加到队列中
+        // 创建loading实例
+        if (options.loading) {
+            loadingInstance.count++
+            if (loadingInstance.count === 1) {
+                loadingInstance.target = ElLoading.service(options.loading)
             }
-            // 自动携带token
-            // if (config.headers) {
-            //     const token = adminInfo.getToken()
-            //     if (token)
-            //         config.headers.batoken = token
-            //     const userToken = options.anotherToken || userInfo.getToken()
-            //     if (userToken)
-            //         config.headers['ba-user-token'] = userToken
-            // }
-
-            settingToken(config) // 设置token
-            // 白名单处理，有些接口不携带token
-            if (!whiteListNoTokenApi(config.url)) {
-                delete config.headers.Authorization
-            }
-            return config
-        },
-        error => {
-            return Promise.reject(error)
-        }  // 出错返回一个reject
-    )
-
-    // 响应拦截
-    Axios.interceptors.response.use(
-        response => {
-            removePending(response.config) // 请求完成之后要删除请求map中的请求key
-            options.loading && closeLoading(options) // 关闭loading
-            if (response.config.responseType === 'json') {
-                if (response.data && response.data.code !== 200) {
-                    const {showCodeMessage, showErrorMessage} = options // 开启对应的功能需求
-                    // 针对所有失败的请求进行拦截，实际不会执行该段代码，status非200直接进行下面的error
-                    if (showCodeMessage && response.status !== 200) {
-                        return Promise.reject(response.data) // status不等于200, 页面具体逻辑就不执行了
-                    }
-                    const requestUrl = response.config.url
-                    let hasPath = false // 请求是成功请求，但是结果不对
-                    // 屏蔽的某些接口
-                    noHandleResponseUrlList.forEach(item => {
-                        if (requestUrl.includes(item)) hasPath = true
-                    })
-                    // 针对status为200，但是实际后端code报错
-                    if (showErrorMessage && response.status === 200 && response.data.code !== 200 && !hasPath) {
-                        const {code} = response.data
-                        // 针对token失效情况
-                        if (code === 401) {
-                            // crushLoginTips()
-                        } else {
-                            ElNotification({type: 'error', message: response.data.msg})
-                        }
-                        return Promise.reject(response.data) // code不等于200, 直接页面具体逻辑就不执行了
-                    }
-                } else if (options.showSuccessMessage && response.data && response.data.code === 200) {
-                    ElNotification({
-                        message: response.data.msg ? response.data.msg : 'axios.Operation successful', type: 'success'
-                    })
-                }
-            }
-            return options.reduceDataFormat ? response.data : response // 简洁数据结构功能
-        },
-        error => {
-            error.config && removePending(error.config) // 响应完成之后要删除请求map中的请求key
-            options.loading && closeLoading(options) // 关闭loading
-            options.showErrorMessage && httpErrorStatusHandle(error) // 处理错误状态码
-            return Promise.reject(error) // 错误继续返回给到具体页面
         }
-    )
-}
+        // 自动携带token
+        // if (config.headers) {
+        //     const token = adminInfo.getToken()
+        //     if (token)
+        //         config.headers.batoken = token
+        //     const userToken = options.anotherToken || userInfo.getToken()
+        //     if (userToken)
+        //         config.headers['ba-user-token'] = userToken
+        // }
 
-export default createAxios
+        //settingToken(config) // 设置token
+        // 白名单处理，有些接口不携带token
+        if (!whiteListNoTokenApi(config.url)) {
+            delete config.headers.Authorization
+        }
+        return config
+    },
+    error => {
+        return Promise.reject(error)
+    }  // 出错返回一个reject
+)
+
+// 响应拦截
+service.interceptors.response.use(
+    response => {
+        removePending(response.config) // 请求完成之后要删除请求map中的请求key
+        options.loading && closeLoading(options) // 关闭loading
+        const {showCodeMessage, showErrorMessage} = options // 开启对应的功能需求
+        // 针对所有失败的请求进行拦截，实际不会执行该段代码，status非200直接进行下面的error
+        if (showCodeMessage && response.status !== 200) {
+            return Promise.reject(response.data) // status不等于200, 页面具体逻辑就不执行了
+        }
+        const requestUrl = response.config.url
+        let hasPath = false // 请求是成功请求，但是结果不对
+        // 屏蔽的某些接口
+        noHandleResponseUrlList.forEach(item => {
+            if (requestUrl.includes(item)) hasPath = true
+        })
+        // 针对status为200，但是实际后端code报错
+        if (showErrorMessage && response.status === 200 && response.data.code !== '200' && !hasPath) {
+            const {code} = response.data
+            // 针对token失效情况
+            if (code === 401) {
+                // crushLoginTips()
+            } else {
+                ElNotification({type: 'error', message: response.data.message})
+            }
+            return Promise.reject(response.data) // code不等于200, 直接页面具体逻辑就不执行了
+        }
+        return options.reduceDataFormat ? response.data : response // 简洁数据结构功能
+    },
+    error => {
+        error.config && removePending(error.config) // 响应完成之后要删除请求map中的请求key
+        options.loading && closeLoading(options) // 关闭loading
+        options.showErrorMessage && httpErrorStatusHandle(error) // 处理错误状态码
+        return Promise.reject(error) // 错误继续返回给到具体页面
+    }
+)
+export default service
 
 /**
  * 处理异常

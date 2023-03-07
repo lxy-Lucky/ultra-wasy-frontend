@@ -1,6 +1,18 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import {RouterLink, RouterView} from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import {getTestData} from '@/api/backend/test/test'
+import {onMounted} from "vue";
+
+onMounted(() => {
+  getTestDataFunc()
+})
+const getTestDataFunc = () => {
+  getTestData().then(res => {
+    console.log(res)
+  })
+}
+
 </script>
 
 <template>
