@@ -1,11 +1,14 @@
 <template>
-
+  <div>
+    {{ $route.query.obj }}
+  </div>
 </template>
 
-<script>
-export default {
-  name: "index"
-}
+<script setup>
+import {useRoute} from "vue-router";
+
+const $route = useRoute()
+
 </script>
 
 <style scoped>

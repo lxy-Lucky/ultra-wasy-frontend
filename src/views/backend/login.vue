@@ -74,7 +74,13 @@
 
               <!-- 登录按钮开始 -->
               <el-form-item>
-                <el-button :loading="form.loading" class="submit-button" round type="primary" size="large">
+                <el-button
+                    :loading="form.loading"
+                    @click="onSubmit(formRef)"
+                    class="submit-button"
+                    round
+                    type="primary"
+                    size="large">
                   登录
                 </el-button>
               </el-form-item>
@@ -93,8 +99,11 @@
 import {onBeforeUnmount, onMounted, reactive, ref} from "vue"
 import {uuid} from '@/utils/random'
 import {buildValidatorData} from '@/utils/validate'
-import {ElForm, ElInput} from "element-plus"
+import {ElNotification} from "element-plus"
 import * as pageBubble from '@/utils/pageBubble'
+import {getTestData} from "@/api/backend/test/test"
+import {useRouter} from "vue-router";
+const $router = useRouter();
 
 let timer
 const state = reactive({
@@ -119,7 +128,6 @@ const form = reactive({
   loading: false,
   captcha_id: '',
 })
-
 
 // 表单验证规则
 const rules = reactive({
@@ -146,6 +154,26 @@ onBeforeUnmount(() => {
   clearTimeout(timer)
   pageBubble.removeListeners()
 })
+
+const onSubmit = (formEl) => {
+  if (!formEl) return
+  formEl.validate(valid => {
+    if (valid) {
+      form.loading = true
+      form.captcha_id = state.captchaId
+      getTestData().then(res => {
+        form.loading = false
+        ElNotification({
+          message: res.message,
+          type: 'success',
+        })
+        $router.push({name: 'home', query: {obj: '1234567'}})
+      }).catch(e=>{
+        form.loading = false
+      })
+    }
+  })
+}
 
 </script>
 
