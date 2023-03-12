@@ -13,7 +13,6 @@ const loadingInstance = {target: null, count: 0} // loadingInstance实例
  */
 export const getUrl = function () {
     const value = import.meta.env.VITE_AXIOS_BASE_URL
-    alert(value)
     return value === 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value
 }
 
@@ -32,7 +31,7 @@ export const getUrlPort = function () {
  */
 
 const service = axios.create({
-    baseURL: '/api/',
+    baseURL: getUrl(),
     timeout: 1000 * 10,
     headers: {
         'Content-Type': 'application/json;charset=UTF-8',

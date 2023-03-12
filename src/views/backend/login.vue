@@ -23,7 +23,7 @@
 
           <!-- 表单输入内容开始 -->
           <div class="content">
-            <el-form ref="formRef" :rules="rules" size="large" :model="form">
+            <el-form @keyup.enter="onSubmit(formRef)" ref="formRef" :rules="rules" size="large" :model="form">
               <!-- 用户名框开始 -->
               <el-form-item prop="username">
                 <el-input
@@ -99,22 +99,18 @@
 import {onBeforeUnmount, onMounted, reactive, ref} from "vue"
 import {uuid} from '@/utils/random'
 import {buildValidatorData} from '@/utils/validate'
-import {ElNotification} from "element-plus"
 import * as pageBubble from '@/utils/pageBubble'
 import {getTestData} from "@/api/backend/test/test"
 import {useRouter} from "vue-router";
-const $router = useRouter();
+import {ElNotification} from "element-plus";
+
+const $router = useRouter()
 
 let timer
 const state = reactive({
   showCaptcha: false,
   captchaId: uuid(),
 })
-
-const onChangeCaptcha = () => {
-  form.captcha = ''
-  state.captchaId = uuid()
-}
 
 const formRef = ref()
 const usernameRef = ref()
@@ -155,21 +151,31 @@ onBeforeUnmount(() => {
   pageBubble.removeListeners()
 })
 
+const onChangeCaptcha = () => {
+  form.captcha = ''
+  state.captchaId = uuid()
+}
+
 const onSubmit = (formEl) => {
   if (!formEl) return
   formEl.validate(valid => {
     if (valid) {
       form.loading = true
       form.captcha_id = state.captchaId
+
       getTestData().then(res => {
         form.loading = false
         ElNotification({
-          message: res.message,
           type: 'success',
+          message: res.message
         })
-        $router.push({name: 'home', query: {obj: '1234567'}})
-      }).catch(e=>{
+        $router.push({name: 'home', query: {obj: '我踏马来辣！'}})
+      }).catch(e => {
         form.loading = false
+        ElNotification({
+          type: 'success',
+          message: e.message
+        })
       })
     }
   })
