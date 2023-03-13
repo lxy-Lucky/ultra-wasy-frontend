@@ -1,9 +1,9 @@
 const staticRoutes = [
     {
-        // 首页
+        // 用户登录页面
         path: '/',
-        name: 'home',
-        component: () => import('@/views/index.vue')
+        name: 'userLogin',
+        component: () => import('@/views/frontend/login.vue')
     },
 
     // 管理员登录页面
@@ -11,6 +11,12 @@ const staticRoutes = [
         path: '/admin/login',
         name: 'adminLogin',
         component: () => import('@/views/backend/login.vue'),
+    },
+    {
+        // 首页
+        path: '/index',
+        name: 'index',
+        component: () => import('@/views/index.vue')
     },
 ]
 

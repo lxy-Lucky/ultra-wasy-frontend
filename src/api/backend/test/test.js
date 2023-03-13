@@ -1,11 +1,11 @@
 import request from '@/utils/axios'
 
-const moduleControllerUrl = '/api'
+const moduleControllerUrl = '/'
 
-export function getTestData(params = {}) {
+export function login(params = {}) {
     return request({
-        url: moduleControllerUrl + '/sql',
-        method: 'get',
+        url: moduleControllerUrl + 'doLogin',
+        method: 'post',
         data: params
     })
 }

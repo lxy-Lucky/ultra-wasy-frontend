@@ -29,7 +29,7 @@ export function validatorAccount(rule, val, callback) {
  * 密码验证
  */
 export function regularPassword(val) {
-    return /^(?!.*[&<>"'\n\r]).{6,32}$/.test(val)
+    return /^(?!.*[&<>"'\n\r]).{3,32}$/.test(val)
 }
 
 export function validatorPassword(rule, val, callback) {

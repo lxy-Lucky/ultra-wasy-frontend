@@ -17,7 +17,11 @@ export default defineConfig((mode) => {
     let proxy = {};
     if (VITE_PROXY_URL) {
         proxy = {
-            '/api': {
+            '/doLogin': {
+                target: VITE_PROXY_URL,
+                changeOrigin: true,
+            },
+            '/verifyCode': {
                 target: VITE_PROXY_URL,
                 changeOrigin: true,
             },
