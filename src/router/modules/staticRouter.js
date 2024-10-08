@@ -7,7 +7,6 @@ import {HOME_URL, LOGIN_URL} from "@/config";
 export const staticRouter = [
     {
         path: '/',
-        name: 'Home',
         redirect: HOME_URL
     },
     {
@@ -58,9 +57,8 @@ export const errorRouter = [
     },
 
     // Resolve refresh page, route warnings
-    // {
-    //     path: "/:pathMatch(.*)*",
-    //     component: () => import("@/components/ErrorMessage/404.vue")
-    //
-    // }
+    {
+        path: "*",
+        component: () => import("@/components/ErrorMessage/404.vue")
+    }
 ]

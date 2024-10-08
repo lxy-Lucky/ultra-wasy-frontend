@@ -1,6 +1,5 @@
 <template>
   <el-container>
-
     <el-main>
       <router-view slot-scope="{ component }">
         <transition appear name="fade-transform" mode="out-in">
@@ -14,7 +13,6 @@
       <Footer />
     </el-footer>
   </el-container>
-  
 </template>
 
 <script>

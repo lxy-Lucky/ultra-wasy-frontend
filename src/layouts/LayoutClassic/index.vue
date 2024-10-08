@@ -56,9 +56,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-        // accordion: 'global/accordion',
-        // isCollapse: 'global/isCollapse',
-        menuList: 'auth/authMenuListGet',
+      // accordion: 'global/accordion',
+      // isCollapse: 'global/isCollapse',
+      menuList: 'auth/authMenuListGet',
+      isCollapse: 'global/isCollapse',
+      accordion: 'global/isAccordion',
     }),
 
     title() {
@@ -74,13 +76,12 @@ export default {
       return require('@/assets/images/logo.svg');
     },
   },
-  created() {},
+
   data(){
-    return {
-      isCollapse: false,
-      accordion: false
-    }
-  }
+    return {}
+  },
+
+  created() {}
 };
 </script>
 

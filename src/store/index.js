@@ -15,7 +15,6 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
     // 将模块内容存储到 modules 对象中，使用模块名称作为键
     modules[moduleName] = value[moduleName + 'Store'];
     // 返回累积的 modules 对象
-    console.log(modules);
     return modules;
 
 }, {})
