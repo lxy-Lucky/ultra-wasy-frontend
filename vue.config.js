@@ -5,14 +5,14 @@ module.exports = defineConfig({
     open: true,
     host: 'localhost',
     port: 8080,
-    // proxy: {
-    //     '/api': {
-    //         target: '',
-    //         changeOrigin: true,
-    //         pathRewrite: {
-    //             '^/api': ''
-    //         }
-    //     }
-    // }
+    proxy: {
+        [process.env.VITE_API_URL]: {
+            target: 'https://mock.mengxuegu.com/mock/670776cfa852137b3c4a2ff3/ultra',
+            changeOrigin: true,
+            pathRewrite: {
+                ['^' + process.env.VITE_API_URL]: ''
+            }
+        }
+    }
   }
 })

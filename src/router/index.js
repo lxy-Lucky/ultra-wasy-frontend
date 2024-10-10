@@ -45,22 +45,13 @@ router.beforeEach(async (to, from, next) => {
     if (ROUTER_WHITE_LIST.includes(to.path)) return next()
 
     // 判断是否有 Token，没有重定向到 login 页面
-    // if (!store.getters['user/token']) return next({ path: LOGIN_URL, replace: true })
+    if (!store.getters['user/token']) return next({ path: LOGIN_URL, replace: true })
 
     // 检查是否已经加载了动态路由
     if (!store.getters['auth/authMenuListGet'].length) {
         await loadDynamicRoutes() // 加载动态路由
-        console.log(router.getRoutes());
         return next({ ...to, replace: true }) // 重新跳转当前页面
     }
-
-    // 如果动态路由加载完成后，还没有 404 路由，则添加
-    // if (!router.getRoutes().find(route => route.path === '/:pathMatch(.*)*')) {
-    //     router.addRoute({
-    //         path: '/:pathMatch(.*)*',
-    //         component: () => import('@/components/ErrorMessage/404.vue')
-    //     });
-    // }
 
     // 存储 routerName 做按钮权限筛选
     await store.dispatch('auth/setRouteName', to.name)

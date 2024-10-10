@@ -18,7 +18,7 @@ export function loginApi(data) {
  */
 export function getAuthMenuListApi() {
     return request({
-        url: "/json/authMenuList.json",
+        url: "/authMenuList",
         method: "GET",
     })
 }
@@ -29,7 +29,7 @@ export function getAuthMenuListApi() {
  */
 export function getAuthButtonListApi() {
     return request({
-        url: "/json/authButtonList.json",
+        url: "/authButtonList",
         method: "GET",
     })
 }

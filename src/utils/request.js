@@ -3,7 +3,7 @@ import axios from 'axios'
 // 创建一个 Axios 实例，配置基础 URL、超时时间和默认请求头
 const service = axios.create({
     // 基础 API 地址，从环境变量中读取，若未定义则使用默认的 '/api'
-    // baseURL: process.env.VUE_APP_BASE_API || '/api',
+    baseURL: process.env.VITE_API_URL || '/api',
     // 请求超时时间设置为 5000 毫秒
     timeout: 5000,
     headers: {
